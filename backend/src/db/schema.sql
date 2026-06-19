@@ -1,0 +1,41 @@
+CREATE TABLE IF NOT EXISTS users (
+  id SERIAL PRIMARY KEY,
+  name VARCHAR(100) NOT NULL,
+  email VARCHAR(255) UNIQUE NOT NULL,
+  password_hash TEXT NOT NULL,
+  created_at TIMESTAMPTZ NOT NULL DEFAULT NOW()
+);
+
+CREATE TABLE IF NOT EXISTS boards (
+  id SERIAL PRIMARY KEY,
+  user_id INTEGER NOT NULL REFERENCES users(id) ON DELETE CASCADE,
+  title VARCHAR(150) NOT NULL,
+  created_at TIMESTAMPTZ NOT NULL DEFAULT NOW()
+);
+
+CREATE TABLE IF NOT EXISTS lists (
+  id SERIAL PRIMARY KEY,
+  board_id INTEGER NOT NULL REFERENCES boards(id) ON DELETE CASCADE,
+  title VARCHAR(150) NOT NULL,
+  position INTEGER NOT NULL DEFAULT 0,
+  created_at TIMESTAMPTZ NOT NULL DEFAULT NOW()
+);
+
+CREATE TABLE IF NOT EXISTS tasks (
+  id SERIAL PRIMARY KEY,
+  list_id INTEGER NOT NULL REFERENCES lists(id) ON DELETE CASCADE,
+  board_id INTEGER NOT NULL REFERENCES boards(id) ON DELETE CASCADE,
+  title VARCHAR(200) NOT NULL,
+  description TEXT NOT NULL DEFAULT '',
+  due_date DATE,
+  priority VARCHAR(10) NOT NULL DEFAULT 'Medium'
+    CHECK (priority IN ('Low', 'Medium', 'High')),
+  position INTEGER NOT NULL DEFAULT 0,
+  created_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
+  updated_at TIMESTAMPTZ NOT NULL DEFAULT NOW()
+);
+
+CREATE INDEX IF NOT EXISTS idx_boards_user_id ON boards(user_id);
+CREATE INDEX IF NOT EXISTS idx_lists_board_position ON lists(board_id, position);
+CREATE INDEX IF NOT EXISTS idx_tasks_list_position ON tasks(list_id, position);
+CREATE INDEX IF NOT EXISTS idx_tasks_board_id ON tasks(board_id);
