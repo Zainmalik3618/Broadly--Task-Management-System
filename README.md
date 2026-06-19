@@ -1,4 +1,4 @@
-# Boardly — Trello Lite
+# Boardly — Task Management System
 
 A beginner-friendly PERN task management MVP with private boards, lists, task details, priorities, due dates, and persisted drag-and-drop ordering.
 
